@@ -40,6 +40,8 @@ dependencies:
   path_provider:
   flutter_bloc:
   bloc:
+  equatable:
+  wakelock:
 dev_dependencies:
   flutter_test:
     sdk: flutter
