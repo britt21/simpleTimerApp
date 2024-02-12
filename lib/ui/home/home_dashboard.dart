@@ -175,8 +175,8 @@ class _HomeDashboardState extends State<HomeDashboard>
                         _emptyFavPage("No favorited timers yet",
                             "You can mark a timer as favorite either on\nthe timer creation page or within an existing\ntimer"),
                         _withDataOdooPage(),
-                        _emptyLocalPage("No favorited timers yet",
-                            "You can mark a timer as favorite either on\nthe timer creation page or within an existing\ntimer"),
+                        _emptyLocalPage("You don’t have any local timesheets",
+                            "Create a timer to to begin tracking time"),
                       ],
                     ),
                   ),
@@ -442,11 +442,12 @@ class _HomeDashboardState extends State<HomeDashboard>
                       itemBuilder: (context, index) {
                         final todo = completedTodos[index];
                         print("ALLTOTO ${completedTodos[index].description}");
-                        print("ALLTOTO ${completedTodos[index].isCompleted}");
+                        print("ISFAVCHECKD ${completedTodos[index].isFavorite}");
+
+
 
                         return GestureDetector(
                             onTap: () {
-
                               Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => TaskDetails(
                                   description: "${todo.description}",
@@ -458,7 +459,7 @@ class _HomeDashboardState extends State<HomeDashboard>
                             child: AnimatedBuilder(
                                 animation: animationController,
                                 builder: (context, child) => timewidget(
-                                    context, todo.description, countText)));
+                                    context, todo.description, countText,completedTodos[index].isFavorite)));
                       },
                       itemCount: completedTodos.length,
                     )

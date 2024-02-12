@@ -6,19 +6,22 @@ class Todo {
   late int index;
 
 
-  Todo({required this.description, required this.isCompleted});
+  Todo({required this.description, required this.isCompleted,required,required this.isFavorite});
 
   Todo copyWith({
     String? description,
     bool? isCompleted,
 
 }){
-    return Todo(description: description ?? this.description, isCompleted: isCompleted ?? this.isCompleted);
+    return Todo(description: description ?? this.description, isCompleted: isCompleted ?? this.isCompleted, isFavorite: this.isFavorite);
   }
   factory Todo.fromJson(Map<String, dynamic> json){
     return Todo(
         description: json["description"],
-        isCompleted: json["isCompleted"]);
+        isCompleted: json["isCompleted"],
+          isFavorite: json["isFavorite"]
+);
+
   }
 
 
@@ -26,6 +29,7 @@ class Todo {
     return {
       "description" : description,
       "isCompleted" : isCompleted,
+      "isFavorite" : isFavorite,
     };
   }
 

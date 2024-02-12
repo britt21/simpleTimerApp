@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import '../../utils/colors/Color.dart';
 import '../../utils/drawables/svg.dart';
 
-Widget timewidget(BuildContext context,String title,String time) {
+Widget timewidget(BuildContext context,String title,String time,bool isfav) {
   String shortenedTitle = title != null && title.isNotEmpty
       ? title.length > 15 ? '${title.substring(0, 10)}...' : title
       : ''; // Set to empty string if title is null or empty
@@ -36,7 +36,9 @@ Widget timewidget(BuildContext context,String title,String time) {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
+                        isfav == true  ? Padding(
+                    padding: const EdgeInsets.only(top: 2.0),
+                child: SvgPicture.asset(checkstar)) : Padding(
                           padding: const EdgeInsets.only(top: 2.0),
                           child: SvgPicture.asset(startic),
                         ),
@@ -105,7 +107,7 @@ Widget timewidget(BuildContext context,String title,String time) {
   );
 }
 
-Widget completedhistory(BuildContext context,bool expand) {
+Widget completedhistory(BuildContext context,bool expand,title) {
   return Padding(
     padding: const EdgeInsets.only(left: 15.0, right: 15, bottom: 15),
     child: Container(
@@ -185,7 +187,7 @@ Widget completedhistory(BuildContext context,bool expand) {
                 ),
               ],
             ),
-            Visibility(child: completedhistoryDetail(context),visible: expand,)
+            Visibility(child: completedhistoryDetail(context,title),visible: expand,)
           ],
         ),
       ),
@@ -193,7 +195,7 @@ Widget completedhistory(BuildContext context,bool expand) {
   );
 }
 
-Widget completedhistoryDetail(BuildContext context) {
+Widget completedhistoryDetail(BuildContext context,String title) {
   return Padding(
     padding: const EdgeInsets.only(left: 15.0, right: 15, bottom: 15),
     child: Container(
@@ -225,12 +227,16 @@ Widget completedhistoryDetail(BuildContext context) {
                 ],
               ),
             ),
-            Text(
-                "Sync with Client, communicate, work on the new design with designer, new tasks preparation call with the front end",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                )),
+            Row(
+              children: [
+                Text(
+                    "${title}",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    )),
+              ],
+            ),
           ],
         ),
       ),

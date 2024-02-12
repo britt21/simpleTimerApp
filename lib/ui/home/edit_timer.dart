@@ -241,7 +241,7 @@ class _EditTimerState extends State<EditTimer> {
                                   widget.index,
                                   Todo(
                                       description: descriptiontext.text,
-                                      isCompleted: false)));
+                                      isCompleted: false, isFavorite: false)));
 
                               Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(

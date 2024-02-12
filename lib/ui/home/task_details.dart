@@ -7,35 +7,36 @@ import 'package:simple_timer_app/ui/home/edit_timer.dart';
 import 'package:simple_timer_app/utils/drawables/svg.dart';
 
 import '../../state/todo_bloc.dart';
+import '../../state/todo_state.dart';
 import '../../state/todp_event.dart';
 import '../../utils/colors/Color.dart';
 import '../../utils/drawables/images.dart';
 import '../widgets/time_widget.dart';
 
 class TaskDetails extends StatefulWidget {
-
   final String description;
   final int index;
   final String currentTime;
 
-
   @override
   _TaskDetailsState createState() => _TaskDetailsState();
 
-  const TaskDetails({
-    required this.description, required this.index, required this.currentTime
-  });
+  const TaskDetails(
+      {required this.description,
+      required this.index,
+      required this.currentTime});
 }
 
-class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin {
+class _TaskDetailsState extends State<TaskDetails>
+    with TickerProviderStateMixin {
   PageController _pageController = PageController();
   int _currentPageIndex = 0;
 
   late AnimationController animationController;
 
-  String get countText{
+  String get countText {
     Duration count = animationController.duration! * animationController.value;
-    return '${(count.inHours % 60).toString()}:${(count.inMinutes % 60).toString().padLeft(2,"0")}:${(count.inSeconds % 60).toString().padLeft(2,"0")}';
+    return '${(count.inHours % 60).toString()}:${(count.inMinutes % 60).toString().padLeft(2, "0")}:${(count.inSeconds % 60).toString().padLeft(2, "0")}';
   }
 
   late bool isPaused;
@@ -51,6 +52,7 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
       isPaused = !isPaused;
     });
   }
+
   @override
   void initState() {
     super.initState();
@@ -58,18 +60,15 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
     animationController =
         AnimationController(vsync: this, duration: Duration(seconds: 5000));
 
-    animationController.reverse(from: animationController.value ==  0 ? 1.0 :
-    animationController.value);
+    animationController.reverse(
+        from: animationController.value == 0 ? 1.0 : animationController.value);
   }
-
-
 
   @override
   void dispose() {
     animationController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -92,8 +91,11 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
                 padding: const EdgeInsets.all(20.0),
                 child: Row(
                   children: [
-                    GestureDetector(onTap: (){Navigator.pop(context);
-                      },child: SvgPicture.asset(etback)),
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: SvgPicture.asset(etback)),
                     Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -126,8 +128,6 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
                 children: [
                   _buildTabButton("Timesheet", 0),
                   _buildTabButton("Details", 1),
-
-
                 ],
               ),
               SizedBox(
@@ -171,21 +171,14 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
 
               Expanded(
                   child: PageView(
-                    controller: _pageController,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _currentPageIndex = index;
-                      });
-                    },
-                    children: [
-
-                      _timeSheet(),
-                      _taskDetail()
-
-                    ],
-                  )),
-
-
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPageIndex = index;
+                  });
+                },
+                children: [_timeSheet(widget.description), _taskDetail()],
+              )),
             ],
           ),
         ),
@@ -193,17 +186,16 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
     );
   }
 
-  Widget _timeSheet(){
-  return  Column(
-    children: [
-      Padding(
+  Widget _timeSheet(String title) {
+    return Column(
+      children: [
+        Padding(
           padding: const EdgeInsets.all(15.0),
           child: Container(
             height: 250,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: littimebg),
+                borderRadius: BorderRadius.circular(20), color: littimebg),
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
@@ -233,7 +225,7 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
                     children: [
                       AnimatedBuilder(
                         animation: animationController,
-                        builder:  (context,child)=> Text(
+                        builder: (context, child) => Text(
                           "${countText}",
                           style: TextStyle(
                               color: Colors.white,
@@ -244,32 +236,41 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
                       Row(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(left: 10, right: 8.0),
+                            padding:
+                                const EdgeInsets.only(left: 10, right: 8.0),
                             child: GestureDetector(
-                              onTap: (){
-                                final todoBloc = BlocProvider.of<TodoBloc>(context);
-                                todoBloc.add(EditTodo(widget.index,Todo(description: widget.description, isCompleted: true)));
+                              onTap: () {
+                                final todoBloc =
+                                    BlocProvider.of<TodoBloc>(context);
+                                todoBloc.add(EditTodo(
+                                    widget.index,
+                                    Todo(
+                                        description: widget.description,
+                                        isCompleted: true, isFavorite: false)));
                                 print("STOPPED");
                                 Navigator.pop(context);
-
                               },
                               child: SvgPicture.asset(stop),
                             ),
                           ),
-                          isPaused ? GestureDetector(
-                            onTap: (){
-                              togglePause();
-                            },
-                            child: Container(height: 40,width : 40,child: Image.asset(playic)),
-                          ) : GestureDetector(
-                            onTap:(){
-                              togglePause();
-                            },
-                            child: SvgPicture.asset(etpause),
-                          ),
+                          isPaused
+                              ? GestureDetector(
+                                  onTap: () {
+                                    togglePause();
+                                  },
+                                  child: Container(
+                                      height: 40,
+                                      width: 40,
+                                      child: Image.asset(playic)),
+                                )
+                              : GestureDetector(
+                                  onTap: () {
+                                    togglePause();
+                                  },
+                                  child: SvgPicture.asset(etpause),
+                                ),
                         ],
                       ),
-
                     ],
                   ),
                   Padding(
@@ -288,16 +289,17 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
                             fontSize: 12,
                           )),
                       GestureDetector(
-                          onTap: (){
+                          onTap: () {
                             Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => EditTimer(description: widget.description, index: widget.index,)));
-
+                                builder: (context) => EditTimer(
+                                      description: widget.description,
+                                      index: widget.index,
+                                    )));
                           },
                           child: SvgPicture.asset(editbg))
                     ],
                   ),
-                  Text(
-                      "${widget.description}",
+                  Text("${widget.description}",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -309,34 +311,36 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
             // Other properties of your container
           ),
         ),
-
-      Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 15.0, bottom: 10),
-            child: Text("Completed Records",
-                style: TextStyle(color: Colors.white, fontSize: 12)),
-          )
-        ],
-      ),
-
-      Expanded(
-        child: Container(
-          child: ListView.builder(itemBuilder: (index, context) {
-            return completedhistory(this.context, true);
-          },
-            itemCount: 20,
-          ),
-
+        Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 15.0, bottom: 10),
+              child: Text("Completed Records",
+                  style: TextStyle(color: Colors.white, fontSize: 12)),
+            )
+          ],
         ),
+        Expanded(
+          child: Container(child: BlocBuilder<TodoBloc, TodoState>(
+            builder: (context, state) {
+              final completedTodos = state.todos
+                  .where((todo) => todo.isCompleted == true)
+                  .toList();
 
-      )
-    ],
-  );
-
+              return ListView.builder(
+                itemBuilder: (context, index) => completedhistory(
+                    this.context, true, completedTodos[index].description),
+                itemCount: completedTodos.length,
+              );
+            },
+          )),
+        )
+      ],
+    );
   }
-  Widget _taskDetail(){
-  return  Padding(
+
+  Widget _taskDetail() {
+    return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Column(
         children: [
@@ -345,8 +349,7 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
             child: Container(
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: littimebg),
+                  borderRadius: BorderRadius.circular(20), color: littimebg),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
@@ -362,8 +365,7 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
                     Row(
                       children: [
                         Container(
-                          height: 25,
-                            child: SvgPicture.asset(orangeline)),
+                            height: 25, child: SvgPicture.asset(orangeline)),
                         Padding(
                           padding: const EdgeInsets.only(left: 5.0),
                           child: Text(
@@ -396,13 +398,9 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold),
                           ),
-
-
                         ],
                       ),
                     ),
-
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -411,11 +409,9 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
                               color: Colors.white,
                               fontSize: 12,
                             )),
-
                       ],
                     ),
-                    Text(
-                        "Ivan Zhuikov",
+                    Text("Ivan Zhuikov",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -430,8 +426,7 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
           Container(
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: littimebg),
+                borderRadius: BorderRadius.circular(20), color: littimebg),
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
@@ -444,15 +439,10 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
                       fontSize: 12,
                     ),
                   ),
-
                   Text(
-
                     "${widget.description}",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 13),
+                    style: TextStyle(color: Colors.white, fontSize: 13),
                   ),
-
                 ],
               ),
             ),
@@ -462,8 +452,8 @@ class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin
         ],
       ),
     );
-
   }
+
   Widget _buildTabButton(String title, int index) {
     return GestureDetector(
       onTap: () {
