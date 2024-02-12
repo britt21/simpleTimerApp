@@ -228,7 +228,7 @@ class _CreateTimerState extends State<CreateTimer> {
                             onTap: (){
                               setState(() {
                                 final todoBloc = BlocProvider.of<TodoBloc>(context);
-                                todoBloc.add(AddTodo(Todo(description: "${descriptiontext.text}", isCompleted: true)));
+                                todoBloc.add(AddTodo(Todo(description: "${descriptiontext.text}", isCompleted: false)));
 
                                 if(descriptiontext.text.isNotEmpty){
                                   Navigator.pop(context);

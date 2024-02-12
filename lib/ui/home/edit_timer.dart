@@ -29,6 +29,7 @@ class _EditTimerState extends State<EditTimer> {
 
   @override
   Widget build(BuildContext context) {
+    descriptiontext.text = widget.description;
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -48,7 +49,11 @@ class _EditTimerState extends State<EditTimer> {
                 padding: const EdgeInsets.all(20.0),
                 child: Row(
                   children: [
-                    SvgPicture.asset(etback),
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: SvgPicture.asset(etback)),
                     Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -229,13 +234,18 @@ class _EditTimerState extends State<EditTimer> {
                     child: GestureDetector(
                         onTap: () {
                           setState(() {
-
                             if (descriptiontext.text.isNotEmpty) {
-                              final todoBloc = BlocProvider.of<TodoBloc>(context);
-                              todoBloc.add(EditTodo(widget.index,Todo(description: descriptiontext.text, isCompleted: false)));
+                              final todoBloc =
+                                  BlocProvider.of<TodoBloc>(context);
+                              todoBloc.add(EditTodo(
+                                  widget.index,
+                                  Todo(
+                                      description: descriptiontext.text,
+                                      isCompleted: false)));
 
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => HomeDashboard()));
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) => HomeDashboard()));
                             } else {
                               print("MUST NOT BE EMPTY");
                             }

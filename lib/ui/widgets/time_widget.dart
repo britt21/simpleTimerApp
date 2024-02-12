@@ -3,7 +3,11 @@ import 'package:flutter_svg/svg.dart';
 import '../../utils/colors/Color.dart';
 import '../../utils/drawables/svg.dart';
 
-Widget timewidget(BuildContext context,String title) {
+Widget timewidget(BuildContext context,String title,String time) {
+  String shortenedTitle = title != null && title.isNotEmpty
+      ? title.length > 15 ? '${title.substring(0, 10)}...' : title
+      : ''; // Set to empty string if title is null or empty
+
   return Padding(
     padding: const EdgeInsets.only(left: 15.0, right: 15, bottom: 15),
     child: Container(
@@ -39,7 +43,7 @@ Widget timewidget(BuildContext context,String title) {
                         Padding(
                           padding: const EdgeInsets.only(left: 5.0),
                           child: Text(
-                            "${title}",
+                            "${shortenedTitle}",
                             style: TextStyle(
                                 color: white, fontWeight: FontWeight.w700),
                           ),
@@ -47,6 +51,7 @@ Widget timewidget(BuildContext context,String title) {
                       ],
                     ),
                   ),
+
                   Padding(
                     padding: const EdgeInsets.only(bottom: 3.0),
                     child: Row(
@@ -86,7 +91,7 @@ Widget timewidget(BuildContext context,String title) {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "00:30",
+                    "${time}",
                     style: TextStyle(color: Colors.black),
                   ),
                   SvgPicture.asset(pause)

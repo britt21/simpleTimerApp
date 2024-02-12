@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:simple_timer_app/data/todo.dart';
 import 'package:simple_timer_app/ui/home/create_timer.dart';
 import 'package:simple_timer_app/ui/home/edit_timer.dart';
 import 'package:simple_timer_app/utils/drawables/svg.dart';
 
+import '../../state/todo_bloc.dart';
+import '../../state/todp_event.dart';
 import '../../utils/colors/Color.dart';
 import '../../utils/drawables/images.dart';
 import '../widgets/time_widget.dart';
@@ -12,19 +16,60 @@ class TaskDetails extends StatefulWidget {
 
   final String description;
   final int index;
+  final String currentTime;
 
 
   @override
   _TaskDetailsState createState() => _TaskDetailsState();
 
   const TaskDetails({
-    required this.description, required this.index,
+    required this.description, required this.index, required this.currentTime
   });
 }
 
-class _TaskDetailsState extends State<TaskDetails> {
+class _TaskDetailsState extends State<TaskDetails> with TickerProviderStateMixin {
   PageController _pageController = PageController();
   int _currentPageIndex = 0;
+
+  late AnimationController animationController;
+
+  String get countText{
+    Duration count = animationController.duration! * animationController.value;
+    return '${(count.inHours % 60).toString()}:${(count.inMinutes % 60).toString().padLeft(2,"0")}:${(count.inSeconds % 60).toString().padLeft(2,"0")}';
+  }
+
+  late bool isPaused;
+
+  void togglePause() {
+    print("dpause");
+    setState(() {
+      if (isPaused) {
+        animationController.reverse(from: animationController.value);
+      } else {
+        animationController.stop();
+      }
+      isPaused = !isPaused;
+    });
+  }
+  @override
+  void initState() {
+    super.initState();
+    isPaused = false;
+    animationController =
+        AnimationController(vsync: this, duration: Duration(seconds: 5000));
+
+    animationController.reverse(from: animationController.value ==  0 ? 1.0 :
+    animationController.value);
+  }
+
+
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +92,8 @@ class _TaskDetailsState extends State<TaskDetails> {
                 padding: const EdgeInsets.all(20.0),
                 child: Row(
                   children: [
-                    SvgPicture.asset(etback),
+                    GestureDetector(onTap: (){Navigator.pop(context);
+                      },child: SvgPicture.asset(etback)),
                     Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -185,23 +231,45 @@ class _TaskDetailsState extends State<TaskDetails> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "08:08:20",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),
+                      AnimatedBuilder(
+                        animation: animationController,
+                        builder:  (context,child)=> Text(
+                          "${countText}",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                       Row(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(
-                                left: 10, right: 8.0),
-                            child: SvgPicture.asset(stop),
+                            padding: const EdgeInsets.only(left: 10, right: 8.0),
+                            child: GestureDetector(
+                              onTap: (){
+                                final todoBloc = BlocProvider.of<TodoBloc>(context);
+                                todoBloc.add(EditTodo(widget.index,Todo(description: widget.description, isCompleted: true)));
+                                print("STOPPED");
+                                Navigator.pop(context);
+
+                              },
+                              child: SvgPicture.asset(stop),
+                            ),
                           ),
-                          SvgPicture.asset(etpause),
+                          isPaused ? GestureDetector(
+                            onTap: (){
+                              togglePause();
+                            },
+                            child: Container(height: 40,width : 40,child: Image.asset(playic)),
+                          ) : GestureDetector(
+                            onTap:(){
+                              togglePause();
+                            },
+                            child: SvgPicture.asset(etpause),
+                          ),
                         ],
                       ),
+
                     ],
                   ),
                   Padding(

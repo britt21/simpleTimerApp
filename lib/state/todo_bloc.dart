@@ -60,18 +60,20 @@ class TodoBloc extends HydratedBloc<TodoEvent, TodoState> {
   }
 
   void _onEditTodo(EditTodo event, Emitter<TodoState> emit) {
-    emit(state.copyWith(status: TodoStatus.loading)); // Set loading status
+    emit(state.copyWith(status: TodoStatus.loading));
 
     try {
-      // Update the description of the todo item at the specified index
-      List<Todo> updatedTodos = List.from(state.todos);
-      updatedTodos[event.index].index = event.index;
-      updatedTodos[event.index].description = event.todo.description;
+      List<Todo> todo = List.from(state.todos);
 
-      emit(state.copyWith(todos: updatedTodos, status: TodoStatus.success)); // Emit updated state
+      todo[event.index] = event.todo;
+
+      emit(state.copyWith(todos: todo, status: TodoStatus.success));
+
     } catch (e) {
-      emit(state.copyWith(status: TodoStatus.error)); // Emit error status if an exception occurs
+      emit(state.copyWith(status: TodoStatus.error));
+
     }
   }
+
 
 }

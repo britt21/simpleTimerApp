@@ -21,9 +21,32 @@ class HomeDashboard extends StatefulWidget {
   _HomeDashboardState createState() => _HomeDashboardState();
 }
 
-class _HomeDashboardState extends State<HomeDashboard> {
+class _HomeDashboardState extends State<HomeDashboard>
+    with TickerProviderStateMixin {
   PageController _pageController = PageController();
   int _currentPageIndex = 0;
+  late AnimationController animationController;
+
+  String get countText {
+    Duration count = animationController.duration! * animationController.value;
+    return '${(count.inHours % 60).toString()}:${(count.inMinutes % 60).toString().padLeft(2, "0")}:${(count.inSeconds % 60).toString().padLeft(2, "0")}';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    animationController =
+        AnimationController(vsync: this, duration: Duration(seconds: 5000));
+
+    animationController.reverse(
+        from: animationController.value == 0 ? 1.0 : animationController.value);
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +84,9 @@ class _HomeDashboardState extends State<HomeDashboard> {
                       GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => CreateTimer(description: '',)));
+                              builder: (context) => CreateTimer(
+                                    description: '',
+                                  )));
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),
@@ -150,7 +175,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                         _emptyFavPage("No favorited timers yet",
                             "You can mark a timer as favorite either on\nthe timer creation page or within an existing\ntimer"),
                         _withDataOdooPage(),
-                        _emptyFavPage("No favorited timers yet",
+                        _emptyLocalPage("No favorited timers yet",
                             "You can mark a timer as favorite either on\nthe timer creation page or within an existing\ntimer"),
                       ],
                     ),
@@ -236,7 +261,8 @@ class _HomeDashboardState extends State<HomeDashboard> {
   }
 
   Widget _emptyOdooPage(String mainText, String subText) {
-    return Center(
+    return Padding(
+      padding: const EdgeInsets.only(top: 60.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -272,8 +298,67 @@ class _HomeDashboardState extends State<HomeDashboard> {
               ),
             ),
           ),
-          SizedBox(height: 20),
-          SvgPicture.asset(getstbtn),
+          Expanded(
+              child: Padding(
+            padding: const EdgeInsets.only(left: 15.0, right: 15),
+            child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => CreateTimer(
+                            description: '',
+                          )));
+                },
+                child: SvgPicture.asset(getstbtn)),
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _emptyLocalPage(String mainText, String subText) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 60.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              height: 160,
+              width: 160,
+              child: SvgPicture.asset(dtime),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              mainText,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              subText,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+              ),
+            ),
+          ),
+          Expanded(
+              child: Padding(
+            padding: const EdgeInsets.only(left: 15.0, right: 15),
+            child: GestureDetector(
+                onTap: () {}, child: SvgPicture.asset(getstbtn)),
+          )),
         ],
       ),
     );
@@ -329,42 +414,59 @@ class _HomeDashboardState extends State<HomeDashboard> {
 
   Widget _withDataOdooPage() {
     return Column(children: [
-      Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 15, bottom: 20, left: 15),
-            child: Text(
-              "You have 16 Timers",
-              style: TextStyle(color: white, fontWeight: FontWeight.w500),
-            ),
-          ),
-        ],
-      ),
       BlocBuilder<TodoBloc, TodoState>(builder: (context, state) {
-        if (state.todoStatus == TodoStatus.success) {
-          print("ALLTHETODOS ${state.todos}");
-          return Container(
-              height: 450,
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                          onTap: () {
-                            print("DTOFOFO " + state.todos[index].description);
+        final completedTodos =
+            state.todos.where((todo) => todo.isCompleted == false).toList();
 
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => TaskDetails(
-                                  description: "${state.todos[index].description}",index: index,
-                                )));
-
-                          },
-                      child: timewidget(context, state.todos[index].description));
-                },
-                itemCount: state.todos.length,
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15, bottom: 0, left: 15),
+                    child:completedTodos.length != 0 ? Text(
+                      "You have ${completedTodos.length} Timers",
+                      style: TextStyle(color: white, fontWeight: FontWeight.w500),
+                    ) : Text("") ,
+                  ),
+                ],
+              ),
             ),
-          );
-        } else {
-          return _emptyOdooPage("mainText", "subText");
-        }
+
+            Container(
+              height: 450,
+              child: completedTodos.isNotEmpty
+                  ? ListView.builder(
+                      itemBuilder: (context, index) {
+                        final todo = completedTodos[index];
+                        print("ALLTOTO ${completedTodos[index].description}");
+                        print("ALLTOTO ${completedTodos[index].isCompleted}");
+
+                        return GestureDetector(
+                            onTap: () {
+
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => TaskDetails(
+                                  description: "${todo.description}",
+                                  index: index,
+                                  currentTime: countText,
+                                ),
+                              ));
+                            },
+                            child: AnimatedBuilder(
+                                animation: animationController,
+                                builder: (context, child) => timewidget(
+                                    context, todo.description, countText)));
+                      },
+                      itemCount: completedTodos.length,
+                    )
+                  : _emptyOdooPage("You don’t have any completed timesheets",
+                      "Create new timesheets"),
+            ),
+          ],
+        );
       })
     ]);
   }
@@ -372,6 +474,4 @@ class _HomeDashboardState extends State<HomeDashboard> {
   void addTodo(Todo todo) {
     context.read<TodoBloc>().add(AddTodo(todo));
   }
-
-
 }

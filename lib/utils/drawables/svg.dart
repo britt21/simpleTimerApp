@@ -22,3 +22,5 @@ const  etsettings = "assets/image/svg/etsettings.svg";
 const  stop = "assets/image/svg/stop.svg";
 const  etpause = "assets/image/svg/etpause.svg";
 const  done = "assets/image/svg/done.svg";
+const  dtime = "assets/image/svg/dtime.svg";
+const  play = "assets/image/svg/play.svg";
