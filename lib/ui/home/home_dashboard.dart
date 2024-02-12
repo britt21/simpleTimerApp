@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:simple_timer_app/data/todo.dart';
+import 'package:simple_timer_app/state/todo_bloc.dart';
+import 'package:simple_timer_app/state/todo_state.dart';
+import 'package:simple_timer_app/state/todp_event.dart';
+import 'package:simple_timer_app/ui/home/create_timer.dart';
+import 'package:simple_timer_app/ui/home/task_details.dart';
 import 'package:simple_timer_app/ui/widgets/time_widget.dart';
 import 'package:simple_timer_app/utils/colors/Color.dart';
 import 'package:flutter/services.dart';
 import 'package:simple_timer_app/utils/drawables/svg.dart';
+import 'package:simple_timer_app/utils/navigation/navigation.dart';
 import '../../utils/drawables/images.dart';
 
 import 'package:flutter/material.dart';
@@ -50,9 +58,15 @@ class _HomeDashboardState extends State<HomeDashboard> {
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: SvgPicture.asset(addtodo),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => CreateTimer(description: '',)));
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: SvgPicture.asset(addtodo),
+                        ),
                       ),
                     ],
                   ),
@@ -67,50 +81,62 @@ class _HomeDashboardState extends State<HomeDashboard> {
                           _buildTabButton("Local", 2),
                         ],
                       ),
-
-                      SizedBox(height: 10,),
+                      SizedBox(
+                        height: 10,
+                      ),
                       _currentPageIndex == 0
-                          ? SizedBox(child: Stack(children:[
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20.0,right: 15,top: 1),
-                          child: Divider(height: 2,color: Colors.grey,),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 40.0),
-                          child: _buildTabIndicator(),
-                        ),
-
-                      ]
-
-                      ))
-                          :_currentPageIndex == 1
-                          ? SizedBox(child: Stack(children:[
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20.0,right: 15,top: 1),
-                          child: Divider(height: 2,color: Colors.grey,),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 30.0),
-                          child: _buildTabIndicator(),
-                        ),
-
-                      ]
-
-                      )) : _currentPageIndex == 2
-                          ? SizedBox(child: Stack(children:[
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20.0,right: 15,top: 1),
-                          child: Divider(height: 2,color: Colors.grey,),
-                        ), Padding(
-                          padding: const EdgeInsets.only(left: 1.0),
-                          child: _buildTabIndicator(),
-                        ),]))
-                          : _buildTabIndicatorblack(),
-
+                          ? SizedBox(
+                              child: Stack(children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 20.0, right: 15, top: 1),
+                                child: Divider(
+                                  height: 2,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 40.0),
+                                child: _buildTabIndicator(),
+                              ),
+                            ]))
+                          : _currentPageIndex == 1
+                              ? SizedBox(
+                                  child: Stack(children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 20.0, right: 15, top: 1),
+                                    child: Divider(
+                                      height: 2,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 30.0),
+                                    child: _buildTabIndicator(),
+                                  ),
+                                ]))
+                              : _currentPageIndex == 2
+                                  ? SizedBox(
+                                      child: Stack(children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 20.0, right: 15, top: 1),
+                                        child: Divider(
+                                          height: 2,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 1.0),
+                                        child: _buildTabIndicator(),
+                                      ),
+                                    ]))
+                                  : _buildTabIndicatorblack(),
                     ],
                   ),
                   // Divider(thickness: 1,color: Colors.indigo[200],),
-
 
                   Expanded(
                     child: PageView(
@@ -123,16 +149,13 @@ class _HomeDashboardState extends State<HomeDashboard> {
                       children: [
                         _emptyFavPage("No favorited timers yet",
                             "You can mark a timer as favorite either on\nthe timer creation page or within an existing\ntimer"),
-
-                        _emptyOdooPage(
-                            "You don’t have any favorites\ntimesheets",
-                            "Synchronize with favorites to get started"),
-                        _withDataOdooPage("You don’t have any odoo timesheets",
-                            "Synchronize with odoo to get started"),
+                        _withDataOdooPage(),
+                        _emptyFavPage("No favorited timers yet",
+                            "You can mark a timer as favorite either on\nthe timer creation page or within an existing\ntimer"),
                       ],
                     ),
                   ),
-                  
+
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Row(
@@ -141,7 +164,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                         SvgPicture.asset(time_sheet),
                         SvgPicture.asset(projects),
                         Container(
-                          height: 50,
+                            height: 50,
                             width: 50,
                             child: Image.asset(dsettings))
                       ],
@@ -170,14 +193,12 @@ class _HomeDashboardState extends State<HomeDashboard> {
           Text(
             title,
             style: TextStyle(
-              color: _currentPageIndex == index ? Colors.white : Colors.white,fontWeight: FontWeight.bold
-            ),
+                color: _currentPageIndex == index ? Colors.white : Colors.white,
+                fontWeight: FontWeight.bold),
           ),
 
           SizedBox(height: 3),
           // Adjust spacing between the title and the indicators
-
-          
         ],
       ),
     );
@@ -257,6 +278,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
       ),
     );
   }
+
   Widget _emptyFavPage(String mainText, String subText) {
     return Padding(
       padding: const EdgeInsets.only(top: 60.0),
@@ -293,11 +315,11 @@ class _HomeDashboardState extends State<HomeDashboard> {
                 color: Colors.white,
                 fontSize: 13,
               ),
-
             ),
           ),
-          Expanded(child: Padding(
-            padding: const EdgeInsets.only(left: 15.0,right: 15),
+          Expanded(
+              child: Padding(
+            padding: const EdgeInsets.only(left: 15.0, right: 15),
             child: SvgPicture.asset(getstbtn),
           )),
         ],
@@ -305,28 +327,51 @@ class _HomeDashboardState extends State<HomeDashboard> {
     );
   }
 
-  Widget _withDataOdooPage(String mainText, String subText) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 15, bottom: 20, left: 15),
-              child: Text(
-                "You have 16 Timers",
-                style: TextStyle(color: white, fontWeight: FontWeight.w500),
-              ),
+  Widget _withDataOdooPage() {
+    return Column(children: [
+      Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 15, bottom: 20, left: 15),
+            child: Text(
+              "You have 16 Timers",
+              style: TextStyle(color: white, fontWeight: FontWeight.w500),
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
+      BlocBuilder<TodoBloc, TodoState>(builder: (context, state) {
+        if (state.todoStatus == TodoStatus.success) {
+          print("ALLTHETODOS ${state.todos}");
+          return Container(
+              height: 450,
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                          onTap: () {
+                            print("DTOFOFO " + state.todos[index].description);
 
-        Container(height: 450,
-          child: ListView.builder(itemBuilder: (context,index){
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => TaskDetails(
+                                  description: "${state.todos[index].description}",index: index,
+                                )));
 
-            return timewidget(context);
-          },itemCount:5,),
-        ),
-      ],
-    );
+                          },
+                      child: timewidget(context, state.todos[index].description));
+                },
+                itemCount: state.todos.length,
+            ),
+          );
+        } else {
+          return _emptyOdooPage("mainText", "subText");
+        }
+      })
+    ]);
   }
+
+  void addTodo(Todo todo) {
+    context.read<TodoBloc>().add(AddTodo(todo));
+  }
+
+
 }

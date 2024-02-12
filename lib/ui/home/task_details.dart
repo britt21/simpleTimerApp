@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:simple_timer_app/ui/home/create_timer.dart';
+import 'package:simple_timer_app/ui/home/edit_timer.dart';
 import 'package:simple_timer_app/utils/drawables/svg.dart';
 
 import '../../utils/colors/Color.dart';
@@ -7,8 +9,17 @@ import '../../utils/drawables/images.dart';
 import '../widgets/time_widget.dart';
 
 class TaskDetails extends StatefulWidget {
+
+  final String description;
+  final int index;
+
+
   @override
   _TaskDetailsState createState() => _TaskDetailsState();
+
+  const TaskDetails({
+    required this.description, required this.index,
+  });
 }
 
 class _TaskDetailsState extends State<TaskDetails> {
@@ -208,11 +219,17 @@ class _TaskDetailsState extends State<TaskDetails> {
                             color: Colors.white,
                             fontSize: 12,
                           )),
-                      SvgPicture.asset(editbg)
+                      GestureDetector(
+                          onTap: (){
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => EditTimer(description: widget.description, index: widget.index,)));
+
+                          },
+                          child: SvgPicture.asset(editbg))
                     ],
                   ),
                   Text(
-                      "Sync with Client, communicate, work on the new design with designer, new tasks preparation call with the front end",
+                      "${widget.description}",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -361,7 +378,8 @@ class _TaskDetailsState extends State<TaskDetails> {
                   ),
 
                   Text(
-                    "As a user, I would like to be able to buy a\nsubscription, this would allow me to get a\ndiscount on the products and on the second\nstage of diagnosis",
+
+                    "${widget.description}",
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 13),

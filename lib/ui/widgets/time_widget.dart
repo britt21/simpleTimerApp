@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import '../../utils/colors/Color.dart';
 import '../../utils/drawables/svg.dart';
 
-Widget timewidget(BuildContext context) {
+Widget timewidget(BuildContext context,String title) {
   return Padding(
     padding: const EdgeInsets.only(left: 15.0, right: 15, bottom: 15),
     child: Container(
@@ -39,7 +39,7 @@ Widget timewidget(BuildContext context) {
                         Padding(
                           padding: const EdgeInsets.only(left: 5.0),
                           child: Text(
-                            "iOS app deployment\nwith odd",
+                            "${title}",
                             style: TextStyle(
                                 color: white, fontWeight: FontWeight.w700),
                           ),
